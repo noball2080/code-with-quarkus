@@ -1,5 +1,4 @@
 package org.acme.login;
-
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -14,9 +13,10 @@ public class User extends PanacheEntity {
     
     @Column(unique = true) // 이메일 중복 방지
 
-public String email;
-
+    public String email;
     public String phone; // 연락처
+
+    public String profileImage;
     
     // 아이디로 조회
     public static User findByUsername(String username) {

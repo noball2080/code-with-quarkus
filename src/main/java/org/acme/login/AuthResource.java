@@ -6,6 +6,11 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.net.URI;
+import java.nio.file.Paths;
+import java.util.UUID;
+
+import org.jboss.resteasy.reactive.RestForm;
+
 import java.io.InputStream;
 import io.vertx.ext.web.RoutingContext;
 
@@ -174,5 +179,34 @@ public Response registerSuccess() {
         "META-INF/resources/login/register_success.html");
     return Response.ok(html).build();
 }
+
+@GET
+@Path("/profile")
+@Produces(MediaType.TEXT_HTML)
+public Response profilePage() {
+// ① 세션 체크 (로그인 안 한 사용자 차단)
+String loginUser = context.session().get("loginUser");
+if (loginUser == null) {
+return Response
+.seeOther(URI.create("/login"))
+.build();
+}
+// ② DB에서 사용자 정보 조회
+User user = User.findByUsername(loginUser);
+
+// ③ 세션에 사용자 정보 저장 (HTML에서 활용)
+context.session().put("userEmail", user.email);
+context.session().put("userPhone", user.phone);
+context.session().put("profileImage",
+user.profileImage != null ? user.profileImage : "default.png");
+// ④ 프로필 페이지 반환
+InputStream html = getClass()
+.getClassLoader()
+.getResourceAsStream(
+"META-INF/resources/login/profile.html");
+return Response.ok(html).build();
+}
+
+
 
 }
